@@ -1,0 +1,2 @@
+# scary_autoupdate
+Latest
