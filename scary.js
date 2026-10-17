@@ -21,6 +21,7 @@ const sessionPath = './session';
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 let activeAttackToken = null;
+const processedMessageIds = new Set();
 
 function startAttack() {
   if (activeAttackToken) activeAttackToken.cancelled = true;
@@ -301,9 +302,7 @@ const startSesi = async () => {
     logger: pino({ level: "fatal" }),
     auth: state,
     browser: ['Mac OS', 'Safari', '10.15.7'],
-    getMessage: async (key) => ({
-      conversation: 'Apophis',
-    }),
+    getMessage: async () => undefined,
   };
 
   sock = makeWASocket(connectionOptions);
@@ -312,6 +311,13 @@ const startSesi = async () => {
     try {
       if (!m || !m.messages || !m.messages[0]) return;
       const msg = m.messages[0];
+      
+      if (msg.key.fromMe) return;
+      
+      if (processedMessageIds.has(msg.key.id)) return;
+      processedMessageIds.add(msg.key.id);
+      setTimeout(() => processedMessageIds.delete(msg.key.id), 60000);
+
       const chatId = msg.key.remoteJid || "Tidak Diketahui";
     } catch (error) {}
   });
@@ -361,7 +367,6 @@ Status: Connected`;
 ⠀⣿⣿⣿⣿⣿⠿⢿⣿⣿⠿⢿⣿⣿⣿⣿⣷⡀⠈⣿⣿⣄⠀⣿⣿⣿⠁⠹⣿⣿⣿⣿⣿⢿⣿⣗⠀⠀⠀⠉⠂⣠⣿⣿⡿⠿⣿⣿⣿⣿⣿⣿⣿⣿⣷⠀
 ⢀⡿⡿⠉⣿⡟⠀⢸⣿⠏⠀⠀⢹⠿⠿⢿⣿⣷⣄⠚⢿⣿⣿⣿⡿⠃⢈⣹⣿⣿⣿⣿⣿⡎⢿⣿⣇⠀⠀⣶⣴⣿⣿⣿⣿⣻⣿⣿⣿⣿⣿⣿⣿⣿⣿⡄
 ⢸⣿⣿⣾⣿⡇⠀⢸⠋⠀⠀⠀⠸⠀⠀⠀⠉⠛⣿⣷⣟⣙⠿⣿⡁⣠⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣾⡿⢿⣿⠟⢿⡏⠀⢸⠉⠁⠀⠈⢹⢿⣿⣿⣿⡇
-⢸⣿⣿⣿⣿⡇⠀⠾⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠻⠍⠛⢿⠷⣶⣽⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⢿⣿⣆⠀⠁⠀⠀⠀⠀⠈⠀⠀⠀⠀⠞⠀⠘⣿⣿⣟
 ⢸⣿⣿⏣⣿⡗⠀⠀⠀⠀⠀⠀⣠⠒⠊⠉⠉⠉⢉⣒⠦⣄⠀⣸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⣤⣿⣿⠿⠶⠶⢤⣀⣀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⡇
 ⠘⣿⣷⣿⡝⠁⠀⠀⠀⠀⠀⠉⢁⠀⠀⠀⠀⠀⠀⠈⢹⣮⣿⣿⣟⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⠙⠀⠀⠀⠀⠀⠀⠈⠛⢆⠀⠀⠀⠀⠀⠀⠀⠋⢻⡇
 ⠀⠻⣿⣤⠁⠀⠀⠀⠀⠀⣤⠈⠋⠀⠀⠀⠀⠀⠀⠀⠈⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠳⡄⠀⠀⠀⠀⠀⢠⡿⠁
